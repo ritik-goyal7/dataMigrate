@@ -24,20 +24,20 @@ export async function saveTransactions(request: HttpRequest, context: Invocation
         const database = client.db(cosmosDbName);
         const collection = database.collection(cosmosDbCollection);
 
-        const transaction = request.body;
+        const transactions = "orders" in request.body ? request.body["orders"] : [];
 
-        if (!transaction) {
+        if (!transactions) {
             return {
                 status: 400,
                 body: "Please pass a transaction in the request body"
             };
         }
 
-        const result = await collection.insertOne(transaction);
+        const result = await collection.insertMany(transactions as any);
 
         return {
             status: 200,
-            body: `Transaction saved successfully. id: ${result.insertedId}`
+            body: `Transaction saved successfully. id: ${result.insertedIds}`
         };
     } catch (error) {
         context.error("An error occurred:", error);
