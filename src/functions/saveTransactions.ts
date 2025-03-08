@@ -24,8 +24,11 @@ export async function saveTransactions(request: HttpRequest, context: Invocation
         const database = client.db(cosmosDbName);
         const collection = database.collection(cosmosDbCollection);
 
-        context.info("Received req body: ", request.body);
-        const transactions = ("orders" in request.body ? request.body["orders"] : []) as any[];
+        const body = await request.json();
+
+        context.info("Received req body: ", body);
+
+        const transactions = ( typeof body === "object" && "orders" in body ? body["orders"] : []) as any[];
 
         if (!transactions || transactions.length === 0) {
             return {
